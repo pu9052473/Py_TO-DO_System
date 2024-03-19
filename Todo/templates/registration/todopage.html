@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <script>
+        var token = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+
+        function updateTodo(id) {
+            const completeStatus = document.querySelector(`#checkbox${id}`).checked //Here # Indicates that what follows is an ID selector.
+
+            fetch(`/todos/${id}/markAsCompleted`, {  //Route To be send
+                method: "put", //Specefies Methode It can Be any
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ //Gives A request with body
+                    "_csrf": token,
+                    completed: completeStatus
+                })
+            })
+                .then((res) => {
+                    if (res.ok) { //checking if response is true
+                        window.location.reload(); //Reload Page
+                    }
+                })
+                .catch((err) => console.log(err)) //Logs Error
+        }
+
+        function deleteTodo(id) {
+            fetch(`/todos/${id}`, {
+                method: "delete",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ //Gives A request with body
+                    "_csrf": token
+                })
+            })
+                .then((res) => {
+                    if (res.ok) {
+                        alert(`Item With Id:${id} Delted Succesfully`);
+                        window.location.reload(); //Reload Page
+                    }
+                })
+                .catch((err) => { console.log(err) })
+        }
+    </script>
+</head>
+
+<body>
+    <div class="header grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %>
+            <div class="my-3"> <a href="/signout" class="text-purple-700" >Signout</a> </div>
+                <form action="/todos" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                    <div class="text-red-500"> <%- include('message.ejs')%> </div>
+                    <div class="flex gap-2 py-4">
+                        <div class="flex-auto">
+                            <input class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm" type="text" placeholder="What Next!" name="title" required />
+                        </div>
+                        <div class="flex-auto">
+                            <input type="date" name="dueDate" class="border border-gray-300 rounded text-gray-900 w-full p-2 text-sm  leading-4" />
+                        </div>
+                        <div class="flex-none">
+                            <button class="bg-green-600 text-white px-5 py-1.5 rounded font-medium mr-2" type="submit">Add</button>
+                        </div>
+                    </div>
+                </form>
+                
+        </div>
+    </div>
+    </div>
+    <div class=" footer grid grid-cols-6 bottom-px">
+        <div class="container col-start-3 col-span-2 ">
+            <!-- <%- include('todo.ejs') %> -->
+            <div class="inset-y-0">
+                <div id="count-overdue" class="flex mt-5">
+                    <h5 class="w-14 text-black-600 font-semibold ">Overdue</h5>
+                    <div
+                        class="w-6 h-5 bg-purple-500 rounded-lg-500 flex items-center justify-center rounded border border-gray-900 flex-none ml-3 ">
+                        <span class="text-black text-sm">
+                            <%= overdueTodos.length %>
+                        </span>
+                    </div>
+                </div>
+                <div class="flex w-fit items-center my-2 px-2 py-1 pr-2 rounded hover:bg-gray-10">
+                    <div class=" text-sm text-blue-700 cursor-pointer">
+                        <%- include('todos.ejs',{allTodo:overdueTodos}) %>
+                    </div>
+                </div>
+                <div id="count-due-today" class="flex mt-5">
+                    <h5 class="text-black-600 font-semibold ">Due Today</h5>
+                    <div class="w-6 h-5 bg-purple-500 rounded-lg-500 flex items-center justify-center rounded border border-gray-900 flex-none ml-3 ">
+                        <span class="text-black text-sm">
+                            <%= dueTodayTodos.length %>
+                        </span>
+                    </div>
+                </div>
+                     <div class=" text-sm text-blue-700 cursor-pointer">
+                        <%- include('todos.ejs',{allTodo:dueTodayTodos}) %>
+                     </div>   
+                    <div id="count-due-later" class="flex mt-5">
+                        <h5 class="text-black-600 font-semibold ">Due Later</h5>
+                        <div
+                            class="w-6 h-5 bg-purple-500 rounded-lg-500 flex items-center justify-center rounded border border-gray-900 flex-none ml-3 ">
+                            <span class="text-black text-sm">
+                                <%= dueLaterTodos.length %>
+                            </span>
+                        </div>
+                    </div>
+                  <div class=" text-sm text-blue-700 cursor-pointer">
+                    <%- include('todos.ejs',{allTodo:dueLaterTodos}) %>
+                  </div>  
+                  <div id="count-due-later" class="flex mt-5">
+                    <h5 class="text-black-600 font-semibold ">Completed Items</h5>
+                    <div
+                        class="w-6 h-5 bg-purple-500 rounded-lg-500 flex items-center justify-center rounded border border-gray-900 flex-none ml-3 ">
+                        <span class="text-black text-sm">
+                            <%= completed.length %>
+                        </span>
+                    </div>
+                </div>
+              <div class=" text-sm text-blue-700 cursor-pointer">
+                <%- include('todos.ejs',{allTodo:completed}) %>
+              </div>  
+            </div>
+        </div>
+    </div>
+    <div class=" footer grid grid-cols-6 bottom-px">
+        <div class=" col-start-3 col-span-2">
+            <%- include('footer.ejs') %>
+        </div>
+    </div>
+
+</body>
+
+</html>

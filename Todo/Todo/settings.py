@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,9 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
     'django.contrib.staticfiles',
     'todoApp.apps.TodoappConfig',
+    'django.contrib.messages',
 ]
 
 MIDDLEWARE = [
@@ -46,8 +47,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
 ROOT_URLCONF = 'Todo.urls'
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'Todo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,8 +80,8 @@ DATABASES = {
         'ENGINE': 'djongo',
         'ENFORCE_SCHEMA': True,
         'CLIENT': {
-            "host": "mongodb+srv://pu9052473:Uday1003@cluster.qb5mlsv.mongodb.net/?retryWrites=true&w=majority&appName=cluster",
             "name": "TO-DO_system",  # Use 'name' instead of 'host' for the database name
+            "host": "mongodb+srv://pu9052473:Uday1003@cluster.qb5mlsv.mongodb.net/TO-DO_system?retryWrites=true&w=majority&appName=cluster",
             "authMechanism": "SCRAM-SHA-1"
         },
     }
@@ -105,6 +106,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # 'todoApp.backends.UsersAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# PASSWORD_HASHERS = [
+#     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+# ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
